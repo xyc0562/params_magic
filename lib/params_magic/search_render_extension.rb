@@ -96,7 +96,7 @@ module ParamsMagic
     # @param serializer Class, if not passed in, will infer from current controller class
     # @param model Class, if not passed in, will infer from current controller class
     # @param &block block, if not passed in, will call model.all
-    def json_common_pagination(fields_like=[], fields_eq=[], fields_comp=[], serializer=nil, model=nil, &block)
+    def json_search_pagination(fields_like=[], fields_eq=[], fields_comp=[], serializer=nil, model=nil, &block)
       json_pagination serializer do
         if block_given?
           common_search fields_like, fields_eq, fields_comp, &block
@@ -189,7 +189,9 @@ module ParamsMagic
       end
     end
 
-    def common_search_pagination(fields_like=[], fields_eq=[], fields_comp=[], &block)
+    ##
+    # Combine common_search and pagination
+    def search_pagination(fields_like=[], fields_eq=[], fields_comp=[], &block)
       common_search(fields_like, fields_eq, fields_comp) { with_pagination &block }
     end
 

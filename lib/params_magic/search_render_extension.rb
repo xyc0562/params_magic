@@ -4,7 +4,7 @@ module ParamsMagic
     ##
     # Render an array of entities
     def render_jsons(entries, serializer=nil, root='entries', modify_serializer=true, page=nil)
-      serializer ||= "#{Utils.base_name(self.class)}Serializer".demodulize.constantize
+      serializer ||= "#{ParamsMagic::Utils.base_name(self.class)}Serializer".demodulize.constantize
       if entries.present? && modify_serializer
         serializer = modify_assocs serializer, entries[0]
       end
@@ -20,8 +20,8 @@ module ParamsMagic
     ##
     # Render a single entity
     def render_json(entry=nil, serializer=nil, modify_serializer=true)
-      serializer ||= "#{Utils.base_name(self.class)}Serializer".demodulize.constantize
-      entry ||= instance_variable_get "@#{Utils.instance_name(self.class)}"
+      serializer ||= "#{ParamsMagic::Utils.base_name(self.class)}Serializer".demodulize.constantize
+      entry ||= instance_variable_get "@#{ParamsMagic::Utils.instance_name(self.class)}"
       serializer = modify_assocs serializer, entry if modify_serializer
       render json: entry, serializer: serializer, root: nil
     end
@@ -51,7 +51,7 @@ module ParamsMagic
     ##
     # Take the actual step of dynamically building serializer
     def _build_serializer_step(current_serializer, k, v, method, record_class, serializer_map)
-      if Utils.true?(v) || v.respond_to?(:keys)
+      if ParamsMagic::Utils.true?(v) || v.respond_to?(:keys)
         klasses = [record_class]
         c = record_class
         ##
@@ -77,7 +77,7 @@ module ParamsMagic
               assoc_serializer = _build_serializer assoc_serializer, reflection.class_name.constantize,
                                                    serializer_map[k] || {}, v[:ones] || {}, v[:manies] || {}
             end
-            current_serializer = Utils.add_associations method, current_serializer,
+            current_serializer = ParamsMagic::Utils.add_associations method, current_serializer,
                                                                           assoc_name: k,
                                                                           serializer: assoc_serializer
             # No need to continue if current model contains association of interest
@@ -101,7 +101,7 @@ module ParamsMagic
         if block_given?
           common_search fields_like, fields_eq, fields_comp, &block
         else
-          model ||= Utils.base_name(self.class).demodulize.constantize
+          model ||= ParamsMagic::Utils.base_name(self.class).demodulize.constantize
           common_search fields_like, fields_eq, fields_comp do
             model.all
           end
@@ -233,7 +233,7 @@ module ParamsMagic
       end
       id = params[:id]
       if id
-        base = Utils.base_name(self.class).demodulize
+        base = ParamsMagic::Utils.base_name(self.class).demodulize
         kv_map[base] = id
       end
       kv_map.each do |k,v|
@@ -250,11 +250,11 @@ module ParamsMagic
       one = 'with_one_'
       # Clean-up
       params.each do |k, v|
-        if k.start_with?(many) && (Utils.true?(v) || v.respond_to?(:keys))
+        if k.start_with?(many) && (ParamsMagic::Utils.true?(v) || v.respond_to?(:keys))
           key = k.to_s.sub many, ''
           entry = v.respond_to?(:keys) ? v : true
           manies[key] = entry
-        elsif k.start_with?(one) && (Utils.true?(v) || v.respond_to?(:keys))
+        elsif k.start_with?(one) && (ParamsMagic::Utils.true?(v) || v.respond_to?(:keys))
           key = k.to_s.sub one, ''
           entry = v.respond_to?(:keys) ? v : true
           ones[key] =entry

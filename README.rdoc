@@ -1,3 +1,0 @@
-= ParamsMagic
-
-Licence: MIT-LICENSE.

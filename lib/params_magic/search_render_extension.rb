@@ -196,7 +196,14 @@ module ParamsMagic
     ##
     # Combine common_search and pagination
     def search_pagination(fields_like=[], fields_eq=[], fields_comp=[], &block)
-      common_search(fields_like, fields_eq, fields_comp) { with_pagination &block }
+      if block_given?
+        common_search(fields_like, fields_eq, fields_comp) { with_pagination &block }
+      else
+        model ||= ParamsMagic::Utils.base_name(self.class).demodulize.constantize
+        common_search fields_like, fields_eq, fields_comp do
+          with_pagination { model.all }
+        end
+      end
     end
 
     def _create_comparison(entries, field, value, symbol)

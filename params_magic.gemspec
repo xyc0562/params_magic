@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.version     = ParamsMagic::VERSION
   s.authors     = ["Yecheng Xu"]
   s.email       = ["xyc0562@gmail.com"]
-  s.homepage    = "TODO"
+  s.homepage    = "https://github.com/xyc0562/params-magic"
   s.summary     = "Helper methods for search & render in controller actions, plus helpers for building dynamic " +
       "active_model_serializer instances based on passed in parameters"
   s.description = "This is currently intended for internal use and may not come with support and much documentation."

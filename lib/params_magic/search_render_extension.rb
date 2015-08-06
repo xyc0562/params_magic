@@ -125,7 +125,7 @@ module ParamsMagic
       page = params[:page]
       per = params[:per]
       entries = yield
-      if per && per.to_i > 0 && per > ParamsMagic.config.per_page_limit
+      if per.to_i > ParamsMagic.config.per_page_limit
         per = ParamsMagic.config.per_page_limit
       end
       if per

@@ -173,7 +173,7 @@ module ParamsMagic
         entries = _create_comparison entries, field, le_v, '<='
       end
       # Deal with keyword
-      keyword = params.delete :keyword
+      keyword = params[:keyword]
       if keyword
         query = ''
         fields_like.each_with_index do |field, idx|

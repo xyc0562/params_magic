@@ -125,16 +125,9 @@ module ParamsMagic
       page = params[:page]
       per = params[:per]
       entries = yield
-      if page
-        per ||= ParamsMagic.config.per_page_limit
-        if per
-          entries.page(page).per per
-        else
-          entries.page page
-        end
-      else
-        # Security feature
-        entries.limit ParamsMagic.config.per_page_limit
+      per ||= ParamsMagic.config.per_page_limit
+      if per
+        entries.page(page).per per
       end
     end
 

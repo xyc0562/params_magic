@@ -196,6 +196,10 @@ module ParamsMagic
       end
     end
 
+    def common_search_pagination(fields_like=[], fields_eq=[], fields_comp=[], &block)
+      common_search(fields_like, fields_eq, fields_comp) { with_pagination &block }
+    end
+
     def _create_comparison(entries, field, value, symbol)
       value ? entries.where("#{field} #{symbol} ?", value) : entries
     end

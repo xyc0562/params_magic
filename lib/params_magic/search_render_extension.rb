@@ -182,7 +182,7 @@ module ParamsMagic
             query += ' OR '
           end
         end
-        entries.where query, ["%#{keyword}%"]*fields_like.size
+        entries.where query, *(["%#{keyword}%"]*fields_like.size)
       else
         # Deal with individual fields
         fields_like.each do |field|

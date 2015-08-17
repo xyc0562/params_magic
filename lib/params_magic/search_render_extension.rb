@@ -170,7 +170,7 @@ module ParamsMagic
       fields_comp.each do |field|
         type = klass.columns_hash[field.to_s].type
         if type == :datetime
-          parser = DateTime
+          parser = Time
         elsif type == :date
           parser = Date
         end

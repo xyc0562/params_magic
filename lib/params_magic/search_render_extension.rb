@@ -165,8 +165,24 @@ module ParamsMagic
         entries = entries.where(field => value) if value
       end
       # Deal with comparisons
+      # Need to parse Date and Time entries
+      klass = entries.name.constantize
       fields_comp.each do |field|
-        gt_v, ge_v, lt_v, le_v = _extract_prefixed_params params, field, %w(gt_ ge_ lt_ le_)
+        type = klass.columns[field.to_s].type
+        if type == :datetime
+          parser = DateTime
+        elsif type == :date
+          parser = Date
+        end
+        gt_v, ge_v, lt_v, le_v = *(_extract_prefixed_params params, field, %w(gt_ ge_ lt_ le_)).map do |val|
+          begin
+            val = parser.parse val if parser
+          rescue
+            val = nil
+          ensure
+            val
+          end
+        end
         entries = _create_comparison entries, field, gt_v, '>'
         entries = _create_comparison entries, field, ge_v, '>='
         entries = _create_comparison entries, field, lt_v, '<'
@@ -214,7 +230,7 @@ module ParamsMagic
       results = prefixes.map do |pf|
         params["#{pf}#{field}".to_sym]
       end
-      return *results
+      return results
     end
 
     ##

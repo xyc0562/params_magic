@@ -9,9 +9,10 @@ module ParamsMagic
         serializer = modify_assocs serializer, entries[0]
       end
       if root
-        render json: entries, each_serializer: serializer, root: root,
-               meta: { count: entries.respond_to?(:total_count) ? entries.total_count : entries.size,
-                       page: page || params[:page] }
+        meta = { count: entries.respond_to?(:total_count) ? entries.total_count : entries.size,
+                page: page || params[:page] }
+        meta[:page_count] = entries.total_pages if entries.respond_to? :total_pages
+        render json: entries, each_serializer: serializer, root: root, meta: meta
       else
         render json: entries, each_serializer: serializer, root: root
       end

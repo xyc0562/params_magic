@@ -267,8 +267,7 @@ module ParamsMagic
       end
       kv_map.each do |k,v|
         klass = k.constantize
-        fm = options[:friendly_id] ? klass.friendly.find : klass.find
-        instance_variable_set "@#{k.underscore}", fm(v)
+        instance_variable_set "@#{k.underscore}", (options[:friendly_id] ? klass.friendly.find(v) : klass.find(v))
       end
     end
 

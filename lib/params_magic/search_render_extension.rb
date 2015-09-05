@@ -246,7 +246,8 @@ module ParamsMagic
     # +add_associations+, additional object ids, for example:
     #   individual_id: 3 will trigger below action:
     #   @individual = Individual.find 3
-    def set_resource(*additional_ids)
+    def set_resource(options={}, *additional_ids)
+      options = { friendly_id: false }.merge options
       kv_map = {}
       additional_ids.each do |id_key|
         id_key = id_key.to_s
@@ -265,7 +266,9 @@ module ParamsMagic
         kv_map[base] = id
       end
       kv_map.each do |k,v|
-        instance_variable_set "@#{k.underscore}", k.constantize.find(v)
+        klass = k.constantize
+        fm = options[:friendly_id] ? klass.friendly.find : klass.find
+        instance_variable_set "@#{k.underscore}", fm(v)
       end
     end
 

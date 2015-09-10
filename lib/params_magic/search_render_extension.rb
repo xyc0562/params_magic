@@ -163,7 +163,10 @@ module ParamsMagic
       # Deal with fields_id
       fields_eq.each_with_index do |field|
         value = params.delete field
-        entries = entries.where(field => value) if value
+        if value
+          value = value.split ','
+          entries = entries.where field => value
+        end
       end
       # Deal with comparisons
       # Need to parse Date and Time entries

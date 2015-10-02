@@ -233,11 +233,12 @@ module ParamsMagic
           if c.column_names.include? col
             # No need to continue if current model contains method of interest
             found = true
+            c = c
             break
           end
         end
         if found
-          entries = entries.reorder col.to_sym => direction
+          entries = entries.reorder "#{c.name.pluralize}.#{col} #{direction}"
         end
       end
       entries

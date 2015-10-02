@@ -137,7 +137,7 @@ module ParamsMagic
     end
 
     ##
-    # Deal with common search functions
+    # Deal with common search functions, also deals with sort and ordering
     # 1. If fields_eq is present, try to match on fields_id first
     # 2. If fields_comp is present, try to run filter on columns specified:
     #    For example, fields_comp = [:start_date] would accept parameters of:
@@ -158,6 +158,8 @@ module ParamsMagic
     #    matched against :keyword parameter if it is given in the request
     # 4. If :keyword parameter does not exist and :name parameter is present in the request,
     #    :name parameter value will be matched against :name field using ILIKE
+    #
+    # For ordering, '_sort' for attribute name, '_direction' for direction, either 'asc' or 'desc'
     def common_search(fields_like=[], fields_eq=[], fields_comp=[])
       entries = yield
       # Deal with fields_id
@@ -202,15 +204,43 @@ module ParamsMagic
             query += ' OR '
           end
         end
-        entries.where query, *(["%#{keyword}%"]*fields_like.size)
+        entries = entries.where query, *(["%#{keyword}%"]*fields_like.size)
       else
         # Deal with individual fields
         fields_like.each do |field|
           value = params.delete field
           entries = entries.where "#{field} ILIKE ?", "%#{value}%" if value
         end
-        entries
       end
+      # Deal with _sort and _direction
+      if params[:_sort].present?
+        col = params[:_sort]
+        direction = params[:_direction] == 'desc' ? :desc : :asc
+        klasses = [klass]
+        c = klass
+        ##
+        # Handle multi-table inherited models.
+        # Specific association may be present not on the model queried
+        # but rather its acting_as model. In such a case, we loop through
+        # the list of all models and check presence of association on each
+        # of them
+        while c.respond_to?(:acting_as?) && c.acting_as?
+          c = c.acting_as_model.name.constantize
+          klasses << c
+        end
+        found = false
+        klasses.each do |c|
+          if c.column_names.include? col
+            # No need to continue if current model contains method of interest
+            found = true
+            break
+          end
+        end
+        if found
+          entries = entries.reorder col.to_sym => direction
+        end
+      end
+      entries
     end
 
     ##

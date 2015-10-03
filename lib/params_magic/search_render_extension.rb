@@ -220,9 +220,9 @@ module ParamsMagic
         c = klass
         ##
         # Handle multi-table inherited models.
-        # Specific association may be present not on the model queried
+        # Specific attribute may be present not on the model queried
         # but rather its acting_as model. In such a case, we loop through
-        # the list of all models and check presence of association on each
+        # the list of all models and check presence of attribute on each
         # of them
         while c.respond_to?(:acting_as?) && c.acting_as?
           c = c.acting_as_model.name.constantize
@@ -238,7 +238,7 @@ module ParamsMagic
           end
         end
         if found
-          entries = entries.reorder "#{c.name.pluralize}.#{col} #{direction}"
+          entries = entries.reorder "#{c.name.underscore.pluralize}.#{col} #{direction}"
         end
       end
       entries

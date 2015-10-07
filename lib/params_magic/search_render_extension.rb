@@ -174,7 +174,8 @@ module ParamsMagic
       # Need to parse Date and Time entries
       klass = entries.name.constantize
       fields_comp.each do |field|
-        type = klass.columns_hash[field.to_s].type
+        c = _find_host klass, field
+        type = c.columns_hash[field.to_s].type
         if type == :datetime
           parser = Time
         elsif type == :date
@@ -216,32 +217,35 @@ module ParamsMagic
       if params[:_sort].present?
         col = params[:_sort]
         direction = params[:_direction] == 'desc' ? :desc : :asc
-        klasses = [klass]
-        c = klass
-        ##
-        # Handle multi-table inherited models.
-        # Specific attribute may be present not on the model queried
-        # but rather its acting_as model. In such a case, we loop through
-        # the list of all models and check presence of attribute on each
-        # of them
-        while c.respond_to?(:acting_as?) && c.acting_as?
-          c = c.acting_as_model.name.constantize
-          klasses << c
-        end
-        found = false
-        klasses.each do |c|
-          if c.column_names.include? col
-            # No need to continue if current model contains method of interest
-            found = true
-            c = c
-            break
-          end
-        end
-        if found
-          entries = entries.reorder "#{c.name.underscore.pluralize}.#{col} #{direction}"
-        end
+        c = _find_host klass, col
+        entries = entries.reorder "#{c.name.underscore.pluralize}.#{col} #{direction}" if c
       end
       entries
+    end
+
+    def _find_host(klass, col)
+      klasses = [klass]
+      c = klass
+      ##
+      # Handle multi-table inherited models.
+      # Specific attribute may be present not on the model queried
+      # but rather its acting_as model. In such a case, we loop through
+      # the list of all models and check presence of attribute on each
+      # of them
+      while c.respond_to?(:acting_as?) && c.acting_as?
+        c = c.acting_as_model.name.constantize
+        klasses << c
+      end
+      found = false
+      klasses.each do |c|
+        if c.column_names.include? col
+          # No need to continue if current model contains method of interest
+          found = true
+          c = c
+          break
+        end
+      end
+      found ? c : nil
     end
 
     ##

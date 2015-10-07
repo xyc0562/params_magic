@@ -174,8 +174,9 @@ module ParamsMagic
       # Need to parse Date and Time entries
       klass = entries.name.constantize
       fields_comp.each do |field|
+        field = field.to_s
         c = _find_host klass, field
-        type = c.columns_hash[field.to_s].type
+        type = c.columns_hash[field].type
         if type == :datetime
           parser = Time
         elsif type == :date

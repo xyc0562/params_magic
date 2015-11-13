@@ -201,6 +201,7 @@ module ParamsMagic
       if keyword
         query = ''
         fields_like.each_with_index do |field, idx|
+          field = _handle_special_field field
           query += "#{field} ILIKE ?"
           unless idx == fields_like.size - 1
             query += ' OR '
@@ -211,6 +212,7 @@ module ParamsMagic
         # Deal with individual fields
         fields_like.each do |field|
           value = params.delete field
+          field = _handle_special_field field
           entries = entries.where "#{field} ILIKE ?", "%#{value}%" if value
         end
       end
@@ -222,6 +224,19 @@ module ParamsMagic
         entries = entries.reorder "#{c.name.underscore.pluralize}.#{col} #{direction}" if c
       end
       entries
+    end
+
+    def _handle_special_field(field)
+      # A special use  case is when field is equal to id
+      # in this case, we will need two steps:
+      # 1. Convert id to string for searching
+      # 2. Because both parent and children records comes with id,
+      #    we need to provide table name. In this case, we always use
+      #    the leaf record's class
+      if field == 'id'
+        "CAST(#{klass.name.underscore.pluralize}.id)"
+      end
+      field
     end
 
     def _find_host(klass, col)

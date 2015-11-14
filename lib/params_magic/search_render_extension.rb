@@ -97,13 +97,31 @@ module ParamsMagic
     # @param serializer Class, if not passed in, will infer from current controller class
     # @param model Class, if not passed in, will infer from current controller class
     # @param &block block, if not passed in, will call model.all
-    def json_search_pagination(fields_like=[], fields_eq=[], fields_comp=[], serializer=nil, model=nil, &block)
+    def json_search_pagination(fields_like=[], fields_eq=[], fields_comp=[], serializer=nil, model=nil, *args, &block)
+      if fields_like && fields_like.is_a?(Hash)
+        options = fields_like
+        fields_like = []
+      elsif fields_eq && fields_eq.is_a?(Hash)
+        options = fields_eq
+        fields_eq = []
+      elsif fields_comp && fields_comp.is_a?(Hash)
+        options = fields_comp
+        fields_comp = []
+      elsif serializer && serializer.is_a?(Hash)
+        options = serializer
+        serializer = nil
+      elsif model && model.is_a?(Hash)
+        options = model
+        model = nil
+      else
+        options = args.extract_options!
+      end
       json_pagination serializer do
         if block_given?
-          common_search fields_like, fields_eq, fields_comp, &block
+          common_search fields_like, fields_eq, fields_comp, options, &block
         else
           model ||= ParamsMagic::Utils.base_name(self.class).demodulize.constantize
-          common_search fields_like, fields_eq, fields_comp do
+          common_search fields_like, fields_eq, fields_comp, options do
             model.all
           end
         end
@@ -160,8 +178,16 @@ module ParamsMagic
     #    :name parameter value will be matched against :name field using ILIKE
     #
     # For ordering, '_sort' for attribute name, '_direction' for direction, either 'asc' or 'desc'
-    def common_search(fields_like=[], fields_eq=[], fields_comp=[])
+    def common_search(fields_like=[], fields_eq=[], fields_comp=[], *args)
+      options = args.extract_options!
       entries = yield
+      joins = options[:joins]
+      if joins
+        joins = [joins] unless joins.is_a? Array
+        joins.each do |j|
+          entries = entries.joins j
+        end
+      end
       # Deal with fields_id
       fields_eq.each_with_index do |field|
         value = params.delete field

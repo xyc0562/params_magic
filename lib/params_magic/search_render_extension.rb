@@ -221,7 +221,7 @@ module ParamsMagic
         entries = _create_comparison entries, field, ge_v, '>='
         entries = _create_comparison entries, field, lt_v, '<'
         entries = _create_comparison entries, field, le_v, '<='
-        # Deal with nullability
+        # Deal with null comparisons
         null = _extract_prefixed_params(params, field, %w(null_))[0]
         unless null.nil?
           if ParamsMagic::Utils.true? null

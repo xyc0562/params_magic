@@ -354,10 +354,13 @@ module ParamsMagic
       if id
         base = ParamsMagic::Utils.base_name(self.class).demodulize
         kv_map[base] = id
+        base_key = base.underscore
       end
       kv_map.each do |k,v|
         klass = k.constantize
-        instance_variable_set "@#{k.underscore}", (options[:friendly_id] ? klass.friendly.find(v) : klass.find(v))
+        entry = options[:friendly_id] ? klass.friendly.find(v) : klass.find(v)
+        instance_variable_set "@#{k.underscore}", entry
+        instance_variable_set :@_entry, entry if base_key && k.underscore == base_key
       end
     end
 

@@ -32,7 +32,6 @@ module ParamsMagic
 
       def add_associations(method, klass, *assocs)
         Class.new klass do
-          self._associations = self._associations.dup
           assocs.each do |assoc|
             if assoc.class == Hash
               assoc_name = assoc[:assoc_name].to_s

@@ -3,7 +3,7 @@ module ParamsMagic
     protected
     ##
     # Render an array of entities
-    def render_jsons(entries, serializer=nil, root='entries', modify_serializer=true, page=nil)
+    def render_jsons(entries, serializer=nil, root='data', modify_serializer=true, page=nil)
       serializer ||= "#{ParamsMagic::Utils.base_name(self.class)}Serializer".demodulize.constantize
       if entries.present? && modify_serializer
         serializer = modify_assocs serializer, entries[0]
@@ -24,7 +24,7 @@ module ParamsMagic
       serializer ||= "#{ParamsMagic::Utils.base_name(self.class)}Serializer".demodulize.constantize
       entry ||= instance_variable_get "@#{ParamsMagic::Utils.instance_name(self.class)}"
       serializer = modify_assocs serializer, entry if modify_serializer
-      render json: entry, serializer: serializer, root: nil
+      render json: entry, serializer: serializer, root: 'data'
     end
 
     ##
@@ -133,11 +133,7 @@ module ParamsMagic
     def json_pagination(serializer=nil, &block)
       page = params[:page]
       entries = with_pagination &block
-      if page
-        render_jsons entries, serializer
-      else
-        render_jsons entries, serializer, false
-      end
+      render_jsons entries, serializer
     end
 
     def with_pagination

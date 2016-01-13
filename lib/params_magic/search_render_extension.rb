@@ -3,12 +3,12 @@ module ParamsMagic
     protected
     ##
     # Render an array of entities
-    def render_jsons(entries, serializer=nil, root='data', modify_serializer=true, page=nil)
+    def render_jsons(entries, serializer=nil, pagination=false, root='data', modify_serializer=true, page=nil)
       serializer ||= "#{ParamsMagic::Utils.base_name(self.class)}Serializer".demodulize.constantize
       if entries.present? && modify_serializer
         serializer = modify_assocs serializer, entries[0]
       end
-      if root
+      if pagination
         meta = { count: entries.respond_to?(:total_count) ? entries.total_count : entries.size,
                  page: (page || params[:page]).to_i }
         meta[:pageCount] = entries.total_pages if entries.respond_to? :total_pages
@@ -79,8 +79,8 @@ module ParamsMagic
                                                    serializer_map[k] || {}, v[:ones] || {}, v[:manies] || {}
             end
             current_serializer = ParamsMagic::Utils.add_associations method, current_serializer,
-                                                                          assoc_name: k,
-                                                                          serializer: assoc_serializer
+                                                                     assoc_name: k,
+                                                                     serializer: assoc_serializer
             # No need to continue if current model contains association of interest
             break
           end
@@ -133,7 +133,11 @@ module ParamsMagic
     def json_pagination(serializer=nil, &block)
       page = params[:page]
       entries = with_pagination &block
-      render_jsons entries, serializer
+      if page
+        render_jsons entries, serializer, true
+      else
+        render_jsons entries, serializer
+      end
     end
 
     def with_pagination

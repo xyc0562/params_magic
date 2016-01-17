@@ -12,9 +12,9 @@ module ParamsMagic
         meta = { count: entries.respond_to?(:total_count) ? entries.total_count : entries.size,
                  page: (page || params[:page]).to_i }
         meta[:pageCount] = entries.total_pages if entries.respond_to? :total_pages
-        render json: entries, each_serializer: serializer, root: root, meta: meta
+        render json: entries, each_serializer: serializer, root: root, meta: meta, include: '**'
       else
-        render json: entries, each_serializer: serializer, root: root
+        render json: entries, each_serializer: serializer, root: root, include: '**'
       end
     end
 
@@ -24,7 +24,7 @@ module ParamsMagic
       serializer ||= "#{ParamsMagic::Utils.base_name(self.class)}Serializer".demodulize.constantize
       entry ||= instance_variable_get "@#{ParamsMagic::Utils.instance_name(self.class)}"
       serializer = modify_assocs serializer, entry if modify_serializer
-      render json: entry, serializer: serializer, root: 'data'
+      render json: entry, serializer: serializer, root: 'data', include: '**'
     end
 
     ##

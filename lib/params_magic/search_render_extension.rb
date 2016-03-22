@@ -191,7 +191,7 @@ module ParamsMagic
       # Deal with fields_id
       fields_eq.each_with_index do |field|
         value = params.delete field
-        if value
+        unless value.blank?
           value = value.split ',' if value.is_a? String
           entries = entries.where field => value
         end

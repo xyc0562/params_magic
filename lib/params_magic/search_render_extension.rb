@@ -233,7 +233,7 @@ module ParamsMagic
       end
       # Deal with keyword
       keyword = params[:keyword]
-      if keyword
+      if !keyword.blank?
         query = ''
         fields_like.each_with_index do |field, idx|
           field = _handle_special_field field, klass
@@ -248,7 +248,7 @@ module ParamsMagic
         fields_like.each do |field|
           value = params.delete field
           field = _handle_special_field field, klass
-          entries = entries.where "#{field} ILIKE ?", "%#{value}%" if value
+          entries = entries.where "#{field} ILIKE ?", "%#{value}%" unless value.blank?
         end
       end
       # Deal with _sort and _direction

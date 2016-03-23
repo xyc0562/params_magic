@@ -42,7 +42,11 @@ module ParamsMagic
               serializer = "#{assoc_name.to_s.singularize.classify}Serializer".constantize
               # Array means serializer will be deduced
             end
-            send method, assoc_name, serializer: serializer
+            if serializer
+              send method, assoc_name, serializer: serializer
+            else
+              send method, assoc_name
+            end
           end
         end
       end

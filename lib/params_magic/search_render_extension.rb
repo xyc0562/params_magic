@@ -65,6 +65,7 @@ module ParamsMagic
           c = c.acting_as_model.name.constantize
           klasses << c
         end
+        assoc_serializer = nil
         klasses.each do |klass|
           reflection = klass.reflect_on_association k
           if reflection
@@ -73,17 +74,23 @@ module ParamsMagic
             else
               assoc_serializer = "#{reflection.class_name}Serializer".constantize
             end
-            if v.respond_to? :keys
+            if v.respond_to?(:keys)
               # Recursively build association's serializer
               assoc_serializer = _build_serializer assoc_serializer, reflection.class_name.constantize,
                                                    serializer_map[k] || {}, v[:ones] || {}, v[:manies] || {}
             end
-            current_serializer = ParamsMagic::Utils.add_associations method, current_serializer,
-                                                                     assoc_name: k,
-                                                                     serializer: assoc_serializer
             # No need to continue if current model contains association of interest
             break
           end
+        end
+        is_defined = record_class.method_defined? k
+        if !assoc_serializer && is_defined && serializer_map[k]
+          assoc_serializer = serializer_map[k]
+        end
+        if assoc_serializer || is_defined
+          current_serializer = ParamsMagic::Utils.add_associations method, current_serializer,
+                                                                   assoc_name: k,
+                                                                   serializer: assoc_serializer
         end
       end
       current_serializer

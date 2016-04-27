@@ -200,7 +200,11 @@ module ParamsMagic
         value = params.delete field
         unless value.blank?
           value = value.split ',' if value.is_a? String
-          entries = entries.where field => value
+          if value.kind_of? Array
+            entries = entries.where "#{field} in (?)", value
+          else
+            entries = entries.where "#{field} = ?", value
+          end
         end
       end
       # Deal with comparisons

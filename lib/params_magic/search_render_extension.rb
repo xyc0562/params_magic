@@ -69,6 +69,9 @@ module ParamsMagic
         klasses.each do |klass|
           reflection = klass.reflect_on_association k
           if reflection
+            # Only authorize if class name exists
+            puts reflection.class_name
+            authorize reflection.class_name.constantize, 'show?' if Object.const_defined?(reflection.class_name) && @_auth_associations
             if serializer_map[k]
               assoc_serializer = serializer_map[k]
             else
@@ -377,6 +380,11 @@ module ParamsMagic
 
     def set_associations(options={})
       @_serializers = options.delete :serializers || {}
+      if options.key?(:auth_associations)
+        @_auth_associations = options.delete :auth_associations
+      else
+        @_auth_associations = true
+      end
       ones = {}
       manies = {}
       @_associations = { ones: ones, manies: manies }

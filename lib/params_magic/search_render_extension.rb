@@ -70,7 +70,10 @@ module ParamsMagic
           reflection = klass.reflect_on_association k
           if reflection
             # Only authorize if class name exists
-            authorize reflection.class_name.constantize, 'show?' if Object.const_defined?(reflection.class_name) && @_auth_associations
+            klass_name = reflection.respond_to?(:class_name) ? reflection.class_name : reflection.name
+            if Object.const_defined?(klass_name) && @_auth_associations
+              authorize klass_name.constantize, 'index?'
+            end
             if serializer_map[k]
               assoc_serializer = serializer_map[k]
             else

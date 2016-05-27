@@ -199,6 +199,7 @@ module ParamsMagic
         joins.each do |j|
           entries = entries.joins j
         end
+        entries = entries.uniq
       end
       # Deal with fields_id
       fields_eq.each_with_index do |field|

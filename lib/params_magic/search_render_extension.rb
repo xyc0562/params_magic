@@ -11,7 +11,7 @@ module ParamsMagic
       if pagination
         meta = { count: entries.respond_to?(:total_count) ? entries.total_count : entries.size,
                  page: (page || params[:page]).to_i }
-        meta[:pageCount] = entries.total_pages if entries.respond_to? :total_pages
+        meta[:page_count] = entries.total_pages if entries.respond_to? :total_pages
         render json: entries, each_serializer: serializer, root: root, meta: meta, include: '**'
       else
         render json: entries, each_serializer: serializer, root: root, include: '**'

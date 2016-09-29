@@ -69,8 +69,12 @@ module ParamsMagic
         klasses.each do |klass|
           reflection = klass.reflect_on_association k
           if reflection
+            if v.respond_to?(:keys) && v[:class_name]
+              klass_name = v[:class_name]
+            else
+              klass_name = reflection.respond_to?(:class_name) ? reflection.class_name : reflection.name
+            end
             # Only authorize if class name exists
-            klass_name = reflection.respond_to?(:class_name) ? reflection.class_name : reflection.name
             if Object.const_defined?(klass_name) && @_auth_associations
               authorize klass_name.constantize, 'index?'
             end
@@ -81,7 +85,7 @@ module ParamsMagic
             end
             if v.respond_to?(:keys)
               # Recursively build association's serializer
-              assoc_serializer = _build_serializer assoc_serializer, reflection.class_name.constantize,
+              assoc_serializer = _build_serializer assoc_serializer, klass_name.constantize,
                                                    serializer_map[k] || {}, v[:ones] || {}, v[:manies] || {}
             end
             # No need to continue if current model contains association of interest

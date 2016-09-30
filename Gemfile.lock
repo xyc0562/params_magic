@@ -4,7 +4,7 @@ PATH
     params_magic (0.0.1)
       active_model_serializers
       kaminari
-      rails (~> 4.2.3)
+      rails
 
 GEM
   remote: https://rubygems.org/

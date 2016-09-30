@@ -50,6 +50,10 @@ module ParamsMagic
           end
         end
       end
+
+      def params_to_hash(params)
+        params.respond_to? :to_unsafe_h ? params.to_unsafe_h : params.to_hash
+      end
     end
 
   end

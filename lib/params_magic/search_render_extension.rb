@@ -408,9 +408,9 @@ module ParamsMagic
           entry = v.respond_to?(:keys) ? v : true
           ones[key] =entry
         elsif k == 'with_manies'
-          manies.merge! v
+          manies.merge! ParamsMagic::Utils.params_to_hash(v)
         elsif k == 'with_ones'
-          ones.merge! v
+          ones.merge! ParamsMagic::Utils.params_to_hash(v)
         end
       end
     end

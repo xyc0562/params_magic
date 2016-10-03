@@ -203,7 +203,7 @@ module ParamsMagic
         joins.each do |j|
           entries = entries.joins j
         end
-        entries = entries.respond_to? :distinct ? entries.distinct : entries.uniq
+        entries = entries.respond_to?(:distinct) ? entries.distinct : entries.uniq
       end
       # Deal with fields_id
       fields_eq.each_with_index do |field|

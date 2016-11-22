@@ -207,7 +207,8 @@ module ParamsMagic
       end
       # Deal with fields_id
       fields_eq.each_with_index do |field|
-        value = params.delete field
+        value = params[field]
+        params.delete field unless args[:retain_params]
         unless value.blank?
           value = value.split ',' if value.is_a? String
           if value.kind_of? Array
@@ -323,12 +324,12 @@ module ParamsMagic
 
     ##
     # Combine common_search and pagination
-    def search_pagination(fields_like=[], fields_eq=[], fields_comp=[], &block)
+    def search_pagination(fields_like=[], fields_eq=[], fields_comp=[], *args, &block)
       if block_given?
-        common_search(fields_like, fields_eq, fields_comp) { with_pagination &block }
+        common_search(fields_like, fields_eq, fields_comp, *args) { with_pagination &block }
       else
         model ||= ParamsMagic::Utils.base_name(self.class).demodulize.constantize
-        common_search fields_like, fields_eq, fields_comp do
+        common_search fields_like, fields_eq, fields_comp, *args do
           with_pagination { model.all }
         end
       end

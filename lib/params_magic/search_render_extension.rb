@@ -207,8 +207,11 @@ module ParamsMagic
       end
       # Deal with fields_id
       fields_eq.each_with_index do |field|
-        value = params[field]
-        params.delete field unless args[:retain_params]
+        if args[:retain_params]
+          value = params[field]
+        else
+          value =params.delete field
+        end
         unless value.blank?
           value = value.split ',' if value.is_a? String
           if value.kind_of? Array

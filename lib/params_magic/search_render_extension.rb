@@ -207,7 +207,7 @@ module ParamsMagic
       end
       # Deal with fields_id
       fields_eq.each_with_index do |field|
-        if args[:retain_params]
+        if options[:retain_params]
           value = params[field]
         else
           value =params.delete field

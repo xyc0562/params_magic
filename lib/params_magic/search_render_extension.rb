@@ -3,7 +3,8 @@ module ParamsMagic
     protected
     ##
     # Render an array of entities
-    def render_jsons(entries, serializer=nil, root='entries', modify_serializer=true, page=nil)
+    def render_jsons(entries, serializer=nil, root=ParamsMagic.config.multiple_root_key,
+                     modify_serializer=true, page=nil)
       serializer ||= "#{ParamsMagic::Utils.base_name(self.class)}Serializer".demodulize.constantize
       if entries.present? && modify_serializer
         serializer = modify_assocs serializer, entries[0]

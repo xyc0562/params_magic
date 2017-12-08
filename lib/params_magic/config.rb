@@ -31,5 +31,6 @@ module ParamsMagic
   # this is ugly. why can't we pass the default value to config_accessor...?
   configure do |config|
     config.per_page_limit = 100
+    config.multiple_root_key='entries'
   end
 end
